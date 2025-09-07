@@ -1,9 +1,8 @@
 import React from 'react';
-import { Box, Typography, Paper, TextField, Button, Grid } from '@mui/material';
+import { Box, Typography, Paper, TextField, Button, Grid, Switch, FormControlLabel } from '@mui/material';
 import { motion } from 'framer-motion';
 
 const SettingsPage = () => {
-  // In a real app, you would connect this to your user state and API
   return (
     <Box>
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
@@ -17,7 +16,7 @@ const SettingsPage = () => {
 
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
-            <Paper sx={{p: 4, borderRadius: 4}}>
+            <Paper sx={{p: 4, borderRadius: 4, height: '100%'}}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>Change Password</Typography>
                 <TextField fullWidth label="Current Password" type="password" sx={{ mb: 2, mt: 2 }} />
                 <TextField fullWidth label="New Password" type="password" sx={{ mb: 2 }} />
@@ -26,16 +25,17 @@ const SettingsPage = () => {
             </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
-             <Paper sx={{p: 4, borderRadius: 4}}>
+             <Paper sx={{p: 4, borderRadius: 4, height: '100%'}}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>Notification Settings</Typography>
-                 <Typography color="text.secondary" sx={{mt: 2}}>
-                    This is where notification toggles (e.g., for email summaries, new course alerts) would go.
-                </Typography>
+                <Box sx={{mt: 2}}>
+                    <FormControlLabel control={<Switch defaultChecked />} label="Email notifications for new courses" />
+                    <FormControlLabel control={<Switch />} label="Weekly progress summary email" />
+                    <FormControlLabel control={<Switch defaultChecked />} label="Mobile push notifications" />
+                </Box>
             </Paper>
         </Grid>
       </Grid>
     </Box>
   );
 };
-
 export default SettingsPage;

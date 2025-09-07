@@ -6,8 +6,8 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import CourseListPage from './pages/CourseListPage';
-import CourseDetailPage from './pages/CourseDetailPage';
-import SettingsPage from './pages/SettingsPage'; // Import new page
+import RoadmapPage from './pages/RoadmapPage';
+import JobMatchPage from './pages/JobMatchPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -24,8 +24,8 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/courses" element={<CourseListPage />} />
-            <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-            <Route path="/settings" element={<SettingsPage />} /> {/* Add new route */}
+            <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/jobs" element={<JobMatchPage />} />
             <Route path="*" element={<DashboardPage />} />
           </Route>
         </Route>

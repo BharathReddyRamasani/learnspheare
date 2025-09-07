@@ -1,139 +1,49 @@
 import React from 'react';
-import { Box, Typography, Grid, Paper, useTheme } from '@mui/material';
+import { Box, Grid, Typography, Paper } from '@mui/material';
 import StatCard from '../components/StatCard';
 import LearningActivityChart from '../components/LearningActivityChart';
-import ContinueLearningCard from '../components/ContinueLearningCard';
 import RecentActivity from '../components/RecentActivity';
-import Achievements from '../components/Achievements';
-import RecommendedCourses from '../components/RecommendedCourses';
-import Bookmarks from '../components/Bookmarks'; // Import the new component
-
-import SchoolIcon from '@mui/icons-material/School';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'; // For the new stat card
-
-import { useDashboardData } from '../hooks/useDashboardData';
+import KnowledgeGraphVisualizer from '../components/KnowledgeGraphVisualizer';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
+import { useProgress } from '../context/ProgressContext';
+import { School, EmojiEvents, BarChart, AccessTime } from '@mui/icons-material';
 
 const DashboardPage = () => {
-  const { userInfo } = useAuth();
-  const { stats, learningActivity, continueLearningCourse, recentActivity, achievements, recommendedCourses, bookmarks } = useDashboardData();
-  const theme = useTheme();
+    const { userInfo } = useAuth();
+    const { learningState } = useProgress();
 
-  return (
-    <Box sx={{ mt: 2 }}>
-      {/* Welcome Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Paper
-          sx={{
-            p: 4,
-            mb: 4,
-            borderRadius: 4,
-            bgcolor: 'primary.main', // Primary color for the banner
-            color: 'primary.contrastText',
-            position: 'relative',
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            minHeight: { xs: 120, md: 150 }, // Ensure consistent height
-            boxShadow: theme.shadows[4], // Stronger shadow for emphasis
-            '&::before': { // Abstract shapes for visual interest
-              content: '""',
-              position: 'absolute',
-              top: -50,
-              left: -50,
-              width: 200,
-              height: 200,
-              borderRadius: '50%',
-              bgcolor: 'rgba(255,255,255,0.1)',
-              zIndex: 0,
-            },
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -70,
-              right: -70,
-              width: 250,
-              height: 250,
-              borderRadius: '50%',
-              bgcolor: 'rgba(255,255,255,0.08)',
-              zIndex: 0,
-            }
-          }}
-        >
-          <Box sx={{ zIndex: 1 }}>
-            <Typography variant="h4" fontWeight="bold">
-              Welcome, {userInfo?.name?.split(' ')[0]}!
+    const stats = {
+        coursesCompleted: learningState?.knowledgeModel.filter(n => n.mastery > 0.9).length || 0,
+        points: learningState?.points || 0,
+        totalHours: Math.round(learningState?.knowledgeModel.reduce((acc, n) => acc + n.mastery * 10, 0)) || 0, // Simplified calculation
+    };
+
+    return (
+        <Box>
+            <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>Dashboard</Typography>
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+                Welcome back, {userInfo?.name?.split(' ')[0] || 'Learner'}!
             </Typography>
-            <Typography variant="h6" sx={{ opacity: 0.9, mt: 1 }}>
-              Let's make today a productive learning day!
-            </Typography>
-          </Box>
-        </Paper>
-      </motion.div>
 
-      <Grid container spacing={4}>
-        {/* Top Row: Learning Activity Chart & Continue Learning */}
-        <Grid item xs={12} md={8}> {/* Chart takes more space now */}
-          <LearningActivityChart data={learningActivity} />
-        </Grid>
-        <Grid item xs={12} md={4}> {/* Continue Learning is here */}
-          <ContinueLearningCard course={continueLearningCourse} />
-        </Grid>
-
-        {/* New layout for Stat Cards - now two rows, similar to concept */}
-        <Grid item xs={12}>
             <Grid container spacing={4}>
-                {/* First Row of Stats */}
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Enrolled" value={stats.coursesEnrolled} icon={SchoolIcon} color="info" />
+                {/* --- ROW 1: STATS & GRAPH --- */}
+                <Grid item xs={12} lg={8}>
+                    <LearningActivityChart knowledgeModel={learningState?.knowledgeModel} />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Completed" value={stats.coursesCompleted} icon={EmojiEventsIcon} color="success" />
+                <Grid item xs={12} lg={4}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}><StatCard title="Skills Mastered" value={stats.coursesCompleted} icon={EmojiEvents} color="success" /></Grid>
+                        <Grid item xs={12} sm={6}><StatCard title="Points Earned" value={stats.points} icon={BarChart} color="warning" /></Grid>
+                        <Grid item xs={12}><RecentActivity activity={learningState?.recentActivity} /></Grid>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Points" value={stats.pointsEarned} icon={BarChartIcon} color="warning" />
+                
+                {/* --- ROW 2: KNOWLEDGE GRAPH --- */}
+                <Grid item xs={12}>
+                    <KnowledgeGraphVisualizer knowledgeModel={learningState?.knowledgeModel} />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Hours" value={stats.totalHours} icon={AccessTimeIcon} color="secondary" />
-                </Grid>
             </Grid>
-        </Grid>
-
-
-        {/* Bottom Row: Recommended Courses, Recent Activity, Bookmarks, Achievements */}
-        <Grid item xs={12} lg={6}> {/* Recommended courses & Recent Activity */}
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-              <RecommendedCourses courses={recommendedCourses} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <RecentActivity activity={recentActivity} />
-            </Grid>
-          </Grid>
-        </Grid>
-        
-        {/* Bookmarks and Achievements */}
-        <Grid item xs={12} lg={6}>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-              <Bookmarks bookmarks={bookmarks} /> {/* New Bookmarks Component */}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Achievements achievements={achievements} />
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Box>
-  );
+        </Box>
+    );
 };
-
 export default DashboardPage;

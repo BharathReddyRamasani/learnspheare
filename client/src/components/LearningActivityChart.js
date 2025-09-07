@@ -1,57 +1,21 @@
 import React from 'react';
 import { Paper, Typography, Box, useTheme } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { motion } from 'framer-motion';
-
-const LearningActivityChart = ({ data }) => {
+const LearningActivityChart = ({ knowledgeModel = [] }) => {
   const theme = useTheme();
-
+  // We process the raw model to get the top 10 skills for the chart
+  const chartData = knowledgeModel
+    .sort((a, b) => b.mastery - a.mastery)
+    .slice(0, 10)
+    .map(node => ({ name: node.skill, mastery: Math.round(node.mastery * 100) }));
+  
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2, duration: 0.5 }}
-      style={{ height: '100%' }}
-    >
-      <Paper sx={{
-        p: 3,
-        borderRadius: 4,
-        height: '100%',
-        minHeight: 350,
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0px 4px 15px rgba(0,0,0,0.08)',
-      }}>
-        <Typography variant="h6" fontWeight="bold">Learning Activity</Typography>
-        <Box sx={{ flexGrow: 1, mt: 3, ml: -3 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme.palette.divider} />
-              <XAxis dataKey="date" tick={{ fill: theme.palette.text.secondary, fontSize: 12 }} />
-              <YAxis tick={{ fill: theme.palette.text.secondary, fontSize: 12 }} />
-              <Tooltip
-                cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                contentStyle={{
-                  borderRadius: theme.shape.borderRadius,
-                  boxShadow: theme.shadows[3],
-                  backgroundColor: theme.palette.background.paper,
-                  border: 'none',
-                }}
-                itemStyle={{ color: theme.palette.text.primary }}
-                labelStyle={{ color: theme.palette.text.secondary }}
-              />
-              <Bar
-                dataKey="hours"
-                fill={theme.palette.primary.main}
-                radius={[4, 4, 0, 0]}
-                name="Study Hours"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-      </Paper>
-    </motion.div>
+    <Paper sx={{ p: 3, borderRadius: 4, height: '100%', minHeight: 350, display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h6" fontWeight="bold">Top Skills Mastery</Typography>
+      <Box sx={{ flexGrow: 1, mt: 3, ml: -3 }}>
+        <ResponsiveContainer width="100%" height="100%"><BarChart data={chartData} layout="vertical"><CartesianGrid strokeDasharray="3 3" horizontal={false} /><XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12 }} /><YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }} /><Tooltip /><Bar dataKey="mastery" fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} name="Mastery" /></BarChart></ResponsiveContainer>
+      </Box>
+    </Paper>
   );
 };
-
 export default LearningActivityChart;
